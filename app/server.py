@@ -37,13 +37,17 @@ class InputData(Resource):
 
         # get data from cache
         chat_history_ids_str = []
-        step = cache.get("step")
+        # step = cache.get("step")
         # create new token
         if len(token) == 0:
+            #no need to reset chat histroy
             token = ''.join(secrets.choice(
                 string.ascii_uppercase + string.ascii_lowercase) for i in range(7))
             chat_history_ids_str.append(text)
         else:
+            #reset cache at 4
+            cache.delete("chat_history_ids_str_"+token)
+            chat_history_ids_str = []
             chat_history_ids_json_str = cache.get(
                 "chat_history_ids_str_"+token)
             if chat_history_ids_json_str is None:
@@ -88,11 +92,11 @@ class Echo(Resource):
 
 api.add_resource(Echo, '/echo/<text>')
 
-
+# last 5 interactions with the chatbots
 class Clear(Resource):
     def get(self, token):
         cache.delete("step_"+token)
-        cache.delete("chat_history_ids_str_"+token)
+        cache.delete("chat_history_ids_str_"+token) 
         return 'Cleared'
 
 
